@@ -84,6 +84,26 @@ describe('react-side-effect', () => {
       expect(SideEffect).to.have.property('canUseDOM', ExecutionEnvironment.canUseDOM)
     })
 
+    describe('rewind', () => {
+      it('should throw if used the browser', () => {
+        SideEffect.canUseDOM = true
+        expect(SideEffect.rewind).to.throw('You may only call rewind() on the server. Call peek() to read the current state.')
+      })
+
+      it('should return the current state', () => {
+        shallow(<SideEffect foo="bar"/>)
+        const state = SideEffect.rewind()
+        expect(state).to.deep.equal([{foo: 'bar'}])
+      })
+
+      it('should reset the state', () => {
+        shallow(<SideEffect foo="bar"/>)
+        SideEffect.rewind()
+        const state = SideEffect.rewind()
+        expect(state).to.equal(undefined)
+      })
+    })
+
   })
 
 })
