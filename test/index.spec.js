@@ -66,4 +66,24 @@ describe('react-side-effect', () => {
     })
   })
 
+  describe('SideEffect component', () => {
+    class DummyComponent extends React.Component {
+      render() {
+        return <div>hello {this.props.foo}</div>
+      }
+    }
+
+    const withIdentitySideEffect = withSideEffect(identity, noop)
+    let SideEffect
+
+    beforeEach(() => {
+      SideEffect = withIdentitySideEffect(DummyComponent)
+    })
+
+    it('should expose the canUseDOM flag', () => {
+      expect(SideEffect).to.have.property('canUseDOM', ExecutionEnvironment.canUseDOM)
+    })
+
+  })
+
 })
