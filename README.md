@@ -1,1 +1,1 @@
-# clone-gaearon-react-side-effect
+Clone [gaearon/react-side-effect: Create components whose nested prop changes map to a global side effect](https://github.com/gaearon/react-side-effect) for study.
