@@ -120,6 +120,22 @@ describe('react-side-effect', () => {
       })
     })
 
+    describe('handleStateChangeOnClient', () => {
+      it('should execute handleStateChangeOnClient', () => {
+        let sideEffectCollectedData
+
+        const handleStateChangeOnClient = state => (sideEffectCollectedData = state)
+
+        SideEffect = withSideEffect(identity, handleStateChangeOnClient)(DummyComponent)
+
+        SideEffect.canUseDOM = true
+
+        shallow(<SideEffect foo="bar"/>)
+
+        expect(sideEffectCollectedData).to.deep.equal([{foo: 'bar'}])
+      })
+    })
+
   })
 
 })
