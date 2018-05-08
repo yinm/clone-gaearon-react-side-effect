@@ -30,4 +30,40 @@ describe('react-side-effect', () => {
     })
   })
 
+  describe('displayName', () => {
+    const withNoopSideEffect = withSideEffect(noop, noop)
+
+    it('should wrap the displayName of wrapped createClass component', () => {
+      const DummyComponent = React.createClass({displayName: 'Dummy', render: noop})
+      const SideEffect = withNoopSideEffect(DummyComponent)
+
+      expect(SideEffect.displayName).to.equal('SideEffect(Dummy)')
+    })
+
+    it('should wrap the displayName of wrapped ES2015 class component', () => {
+      class DummyComponent extends React.Component {
+        static displayName = 'Dummy'
+        render() {}
+      }
+      const SideEffect = withNoopSideEffect(DummyComponent)
+
+      expect(SideEffect.displayName).to.equal('SideEffect(Dummy)')
+    })
+
+    it('should use the constructor name of the wrapped functional component', () => {
+      function DummyComponent() {}
+
+      const SideEffect = withNoopSideEffect(DummyComponent)
+
+      expect(SideEffect.displayName).to.equal('SideEffect(DummyComponent)')
+    })
+
+    it('should fallback to "Component', () => {
+      const DummyComponent = React.createClass({displayName: null, render: noop})
+      const SideEffect = withNoopSideEffect(DummyComponent)
+
+      expect(SideEffect.displayName).to.equal('SideEffect(Component)')
+    })
+  })
+
 })
