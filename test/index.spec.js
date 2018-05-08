@@ -136,6 +136,40 @@ describe('react-side-effect', () => {
       })
     })
 
+    describe('mapStateOnServer', () => {
+      it('should apply a custom mapStateOnServer function', () => {
+        const mapStateOnServer = ([ prop ]) => prop
+
+        SideEffect = withSideEffect(identity, noop, mapStateOnServer)(DummyComponent)
+        SideEffect.canUseDOM = false
+        shallow(<SideEffect foo="bar"/>)
+        let state = SideEffect.rewind()
+        expect(state).not.to.be.an('Array')
+        expect(state).to.deep.equal({foo: 'bar'})
+
+        SideEffect.canUseDOM = true
+        shallow(<SideEffect foo="bar"/>)
+        state = SideEffect.peek()
+        expect(state).to.an('Array')
+        expect(state).to.deep.equal([{foo: 'bar'}])
+      })
+
+      it('should collect props from all instances', () => {
+        shallow(<SideEffect foo="bar"/>)
+        shallow(<SideEffect something="different"/>)
+
+        const state = SideEffect.peek()
+        expect(state).to.deep.equal([{foo: 'bar'}, {something: 'different'}])
+      })
+
+      it('should render the wrapped component', () => {
+        const markup = renderToStaticMarkup(<SideEffect foo="bar"/>)
+
+        expect(markup).to.equal('<div>hello bar</div>')
+      })
+
+    })
+
   })
 
 })
