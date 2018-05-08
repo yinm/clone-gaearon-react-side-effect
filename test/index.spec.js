@@ -104,6 +104,22 @@ describe('react-side-effect', () => {
       })
     })
 
+    describe('peek', () => {
+      it('should return the current state', () => {
+        shallow(<SideEffect foo="bar"/>)
+        expect(SideEffect.peek()).to.deep.equal([{foo: 'bar'}])
+      })
+
+      it('should NOT reset the state', () => {
+        shallow(<SideEffect foo="bar"/>)
+
+        SideEffect.peek()
+        const state = SideEffect.peek()
+
+        expect(state).to.deep.equal([{foo: 'bar'}])
+      })
+    })
+
   })
 
 })
