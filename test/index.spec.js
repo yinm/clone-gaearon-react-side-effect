@@ -168,8 +168,61 @@ describe('react-side-effect', () => {
         expect(markup).to.equal('<div>hello bar</div>')
       })
 
+      describe('with DOM', () => {
+        const originalWindow = global.window
+        const originalDocument = global.document
+
+        before(done => {
+          jsdom.env('<!doctype html><html><head></head><body></body></html>', (error, window) => {
+            if (!error) {
+              global.window = window
+              global.document = window.document
+            }
+
+            done(error)
+          })
+        })
+
+        after(() => {
+          global.window = originalWindow
+          global.document = originalDocument
+        })
+
+        it('should be findable by react TestUtils', () => {
+          class AnyComponent extends React.Component {
+            render() {
+              return <SideEffect foo="bar"/>
+            }
+          }
+          const wrapper = shallow(<AnyComponent/>)
+          const sideEffect = wrapper.find(SideEffect)
+          expect(sideEffect.props()).to.deep.equal({ foo: 'bar' })
+        })
+
+        it('should only recompute when component updates', () => {
+          let collectCount = 0
+
+          function handleStateChangeOnClient(state) {
+            collectCount += 1
+          }
+
+          SideEffect = withSideEffect(identity, handleStateChangeOnClient)(DummyComponent)
+          SideEffect.canUseDOM = true
+
+          const node = document.createElement('div')
+          document.body.appendChild(node)
+
+          render(<SideEffect text="bar"/>, node)
+          expect(collectCount).to.equal(1)
+          render(<SideEffect text="bar"/>, node)
+          expect(collectCount).to.equal(1)
+
+          render(<SideEffect text="baz"/>, node)
+          expect(collectCount).to.equal(2)
+          render(<SideEffect text="baz"/>, node)
+          expect(collectCount).to.equal(2)
+        })
+      })
     })
-
   })
-
 })
